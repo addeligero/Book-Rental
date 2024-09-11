@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrowed Books Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 0;
+        }
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label, input, select {
+            margin-bottom: 10px;
+        }
+      
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchBooks();
+
+            document.getElementById('addBorrowedBookForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                addBorrowed();
+            });
+        });
+
+        function fetchBooks() {
+            fetch('http://127.0.0.1:8000/api/borrowed')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('borrowedBooksTableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(borrowed => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${borrowed.id}</td>
+                            <td>${borrowed.borrower_name}</td>
+                            <td>${borrowed.book_name}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching books:', error);
+                });
+        }
+
+        function addBorrowed() {
+            const borrowerId = document.getElementById('borrowerId').value;
+            const bookId = document.getElementById('bookId').value;
+
+            const record = {
+                borrower_id: borrowerId,
+                book_id: bookId
+            };
+
+            fetch('http://127.0.0.1:8000/api/addborrowedbooks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(record)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Borrowed book record added successfully');
+                fetchBooks(); // Update the borrowed books list
+                document.getElementById('addBorrowedBookForm').reset();
+            })
+            .catch(error => {
+                console.error('Error adding borrowed book record:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Borrowed Books List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Borrowed ID</th>
+                    <th>Borrower Name</th>
+                    <th>Book Title</th>
+                </tr>
+            </thead>
+            <tbody id="borrowedBooksTableBody">
+                <!-- Data will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    <div class="container">
+        <h2>Add New Borrowed Book Record</h2>
+        <form id="addBorrowedBookForm">
+            <label for="borrowerId">Borrower ID</label>
+            <input type="text" id="borrowerId" name="borrowerId" required>
+            
+            <label for="bookId">Book ID</label>
+            <input type="text" id="bookId" name="bookId" required>
+            
+            <button type="submit">Add Record</button>
+        </form>
+    </div>
+</body>
+</html>

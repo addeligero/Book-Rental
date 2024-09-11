@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('library.png') center/cover no-repeat fixed;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+        }
+        h1{
+            color:white;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            z-index: 1; /* Ensure content is on top of the overlay */
+        }
+        .section {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            flex: 1;    
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .navbar {
+              border-radius: 8px;
+            background-color: #333;
+            overflow: hidden;
+            z-index: 1; /* Ensure navbar is on top of the overlay */
+        }
+
+        .navbar a {
+            float: left;
+            display: block;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 24px 36px;
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchBorrowers();
+            fetchBooks();
+        });
+
+        function fetchBorrowers() {
+            fetch('/borrowers')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('borrowersTableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(borrower => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${borrower.id}</td>
+                            <td>${borrower.name}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching borrowers:', error);
+                });
+        }
+
+        function fetchBooks() {
+            fetch('/books')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('booksTableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(book => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${book.id}</td>
+                            <td>${book.title}</td>
+                            <td>${book.author}</td>
+                            <td>${book.published_date}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching books:', error);
+                });
+        }
+    </script>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="navbar">
+        <a href="home.html">Home</a>
+        <a href="login.html">Borrowers</a>
+        <a href="Bookpage.html">Books</a>
+        <a href="BorrowedBooks.html">Borrow A Book</a>
+    </div>
+    <h1>Library Home Page</h1>
+    
+</body>
+
+</html>
